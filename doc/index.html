@@ -1,0 +1,381 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" lang="en" xml:lang="en">
+<head>
+<title>Picasso3D引擎设计文档</title>
+<!-- 2013-04-13 六 20:39 -->
+<meta http-equiv="Content-Type" content="text/html;charset=utf-8"/>
+<meta name="generator" content="Org-mode"/>
+<meta name="author" content="devilogic"/>
+<style type="text/css">
+ <!--/*--><![CDATA[/*><!--*/
+  .title  { text-align: center; }
+  .todo   { font-family: monospace; color: red; }
+  .done   { color: green; }
+  .tag    { background-color: #eee; font-family: monospace;
+            padding: 2px; font-size: 80%; font-weight: normal; }
+  .timestamp { color: #bebebe; }
+  .timestamp-kwd { color: #5f9ea0; }
+  .right  { margin-left: auto; margin-right: 0px;  text-align: right; }
+  .left   { margin-left: 0px;  margin-right: auto; text-align: left; }
+  .center { margin-left: auto; margin-right: auto; text-align: center; }
+  .underline { text-decoration: underline; }
+  #postamble p, #preamble p { font-size: 90%; margin: .2em; }
+  p.verse { margin-left: 3%; }
+  pre {
+    border: 1px solid #ccc;
+    box-shadow: 3px 3px 3px #eee;
+    padding: 8pt;
+    font-family: monospace;
+    overflow: auto;
+    margin: 1.2em;
+  }
+  pre.src {
+    position: relative;
+    overflow: visible;
+    padding-top: 1.2em;
+  }
+  pre.src:before {
+    display: none;
+    position: absolute;
+    background-color: white;
+    top: -10px;
+    right: 10px;
+    padding: 3px;
+    border: 1px solid black;
+  }
+  pre.src:hover:before { display: inline;}
+  pre.src-sh:before    { content: 'sh'; }
+  pre.src-bash:before  { content: 'sh'; }
+  pre.src-emacs-lisp:before { content: 'Emacs Lisp'; }
+  pre.src-R:before     { content: 'R'; }
+  pre.src-perl:before  { content: 'Perl'; }
+  pre.src-java:before  { content: 'Java'; }
+  pre.src-sql:before   { content: 'SQL'; }
+
+  table { border-collapse:collapse; }
+  td, th { vertical-align:top;  }
+  th.right  { text-align: center;  }
+  th.left   { text-align: center;   }
+  th.center { text-align: center; }
+  td.right  { text-align: right;  }
+  td.left   { text-align: left;   }
+  td.center { text-align: center; }
+  dt { font-weight: bold; }
+  .footpara:nth-child(2) { display: inline; }
+  .footpara { display: block; }
+  .footdef  { margin-bottom: 1em; }
+  .figure { padding: 1em; }
+  .figure p { text-align: center; }
+  .inlinetask {
+    padding: 10px;
+    border: 2px solid gray;
+    margin: 10px;
+    background: #ffffcc;
+  }
+  #org-div-home-and-up
+   { text-align: right; font-size: 70%; white-space: nowrap; }
+  textarea { overflow-x: auto; }
+  .linenr { font-size: smaller }
+  .code-highlighted { background-color: #ffff00; }
+  .org-info-js_info-navigation { border-style: none; }
+  #org-info-js_console-label
+    { font-size: 10px; font-weight: bold; white-space: nowrap; }
+  .org-info-js_search-highlight
+    { background-color: #ffff00; color: #000000; font-weight: bold; }
+  /*]]>*/-->
+</style>
+<script type="text/javascript">
+/*
+@licstart  The following is the entire license notice for the
+JavaScript code in this tag.
+
+Copyright (C) 2012  Free Software Foundation, Inc.
+
+The JavaScript code in this tag is free software: you can
+redistribute it and/or modify it under the terms of the GNU
+General Public License (GNU GPL) as published by the Free Software
+Foundation, either version 3 of the License, or (at your option)
+any later version.  The code is distributed WITHOUT ANY WARRANTY;
+without even the implied warranty of MERCHANTABILITY or FITNESS
+FOR A PARTICULAR PURPOSE.  See the GNU GPL for more details.
+
+As additional permission under GNU GPL version 3 section 7, you
+may distribute non-source (e.g., minimized or compacted) forms of
+that code without the copy of the GNU GPL normally required by
+section 4, provided you include this license notice and a URL
+through which recipients can access the Corresponding Source.
+
+
+@licend  The above is the entire license notice
+for the JavaScript code in this tag.
+*/
+<!--/*--><![CDATA[/*><!--*/
+ function CodeHighlightOn(elem, id)
+ {
+   var target = document.getElementById(id);
+   if(null != target) {
+     elem.cacheClassElem = elem.className;
+     elem.cacheClassTarget = target.className;
+     target.className = "code-highlighted";
+     elem.className   = "code-highlighted";
+   }
+ }
+ function CodeHighlightOff(elem, id)
+ {
+   var target = document.getElementById(id);
+   if(elem.cacheClassElem)
+     elem.className = elem.cacheClassElem;
+   if(elem.cacheClassTarget)
+     target.className = elem.cacheClassTarget;
+ }
+/*]]>*///-->
+</script>
+</head>
+<body>
+<div id="content">
+<h1 class="title">Picasso3D引擎设计文档</h1>
+<div id="table-of-contents">
+<h2>Table of Contents</h2>
+<div id="text-table-of-contents">
+<ul>
+<li><a href="#sec-1">1. 源码目录说明</a>
+<ul>
+<li><a href="#sec-1-1">1.1. include &amp; src</a>
+<ul>
+<li><a href="#sec-1-1-1">1.1.1. libcommon</a></li>
+<li><a href="#sec-1-1-2">1.1.2. libgraphics</a></li>
+<li><a href="#sec-1-1-3">1.1.3. libmath</a></li>
+<li><a href="#sec-1-1-4">1.1.4. libscene</a></li>
+<li><a href="#sec-1-1-5">1.1.5. librender</a></li>
+<li><a href="#sec-1-1-6">1.1.6. libeffect</a></li>
+<li><a href="#sec-1-1-7">1.1.7. libcharacter</a></li>
+<li><a href="#sec-1-1-8">1.1.8. libcharacter_<sub>export</sub></a></li>
+<li><a href="#sec-1-1-9">1.1.9. libeffect_<sub>export</sub></a></li>
+</ul>
+</li>
+<li><a href="#sec-1-2">1.2. doc</a></li>
+<li><a href="#sec-1-3">1.3. lib</a></li>
+<li><a href="#sec-1-4">1.4. bin</a></li>
+</ul>
+</li>
+<li><a href="#sec-2">2. 场景绘制</a></li>
+</ul>
+</div>
+</div>
+
+<div id="outline-container-1" class="outline-2">
+<h2 id="sec-1"><span class="section-number-2">1</span> 源码目录说明</h2>
+<div class="outline-text-2" id="text-1">
+</div><div id="outline-container-1-1" class="outline-3">
+<h3 id="sec-1-1"><span class="section-number-3">1.1</span> include &amp; src</h3>
+<div class="outline-text-3" id="text-1-1">
+<p>
+这两个目录一个是头文件所在,一个是源文件所在在其下有着相同的目录结构
+</p>
+</div>
+<div id="outline-container-1-1-1" class="outline-4">
+<h4 id="sec-1-1-1"><span class="section-number-4">1.1.1</span> libcommon</h4>
+<div class="outline-text-4" id="text-1-1-1">
+<p>
+一些辅助功能以及类型定义
+</p>
+<ul class="org-ul">
+<li>container.hpp/cpp 用于定义内存容器类,本系统有些关键类的内存分配都是存放到此类中
+</li>
+<li>memory_<sub>pool</sub>.hpp/cpp 用于定义内存容器类事实具体内存管理的类
+</li>
+<li>memdata_<sub>converter</sub>.hpp/cpp 用于安全的存取一块内存
+</li>
+<li>crc32.hpp/cpp CRC32算法的实现类
+</li>
+<li>file.hpp/cpp 文件操作类
+</li>
+<li>error.hpp/cpp 错误记录类
+</li>
+<li>string.hpp/cpp 字符串操作类
+</li>
+</ul>
+</div>
+<ol class="org-ol"><li>base<br/><div class="outline-text-5" id="text-1-1-1-1">
+<ul class="org-ul">
+<li>base.hpp/cpp 用于存放一些公共的头以及常用的宏以及支持函数
+</li>
+<li>configure.hpp 用于定义本系统中所使用的C++语言的关键字宏以及编译开关宏
+</li>
+<li>typedef.hpp 用于定义本系统所使用的类型
+</li>
+<li>except.hpp 用于定义C语言SEH异常结构的异常宏代码
+</li>
+</ul>
+</div>
+</li></ol>
+</div>
+
+<div id="outline-container-1-1-2" class="outline-4">
+<h4 id="sec-1-1-2"><span class="section-number-4">1.1.2</span> libgraphics</h4>
+<div class="outline-text-4" id="text-1-1-2">
+<p>
+计算机图形学算法相关实现
+</p>
+<ul class="org-ul">
+<li>vertex.hpp/cpp 顶点类
+</li>
+<li>line.hpp/cpp 线段类
+</li>
+<li>triangle.hpp/cpp 三角图元类
+</li>
+<li>color.hpp/cpp 颜色类
+</li>
+</ul>
+</div>
+</div>
+
+<div id="outline-container-1-1-3" class="outline-4">
+<h4 id="sec-1-1-3"><span class="section-number-4">1.1.3</span> libmath</h4>
+<div class="outline-text-4" id="text-1-1-3">
+<p>
+基础的数学工具算法实现
+</p>
+<ul class="org-ul">
+<li>vector.hpp/cpp 顶点类
+</li>
+<li>matrix.hpp/cpp 矩阵类
+</li>
+</ul>
+</div>
+</div>
+
+<div id="outline-container-1-1-4" class="outline-4">
+<h4 id="sec-1-1-4"><span class="section-number-4">1.1.4</span> libscene</h4>
+<div class="outline-text-4" id="text-1-1-4">
+<p>
+此目录下的代码负责对场景进行渲染管理
+</p>
+<ul class="org-ul">
+<li>object.hpp/cpp 场景中一切对象，例如：“角色，物品，特效,&#x2026;”，实现的基类
+</li>
+<li>character_<sub>object</sub>.hpp/cpp 角色对象类
+</li>
+<li>effect_<sub>object</sub>.hpp/cpp 特效对象类
+</li>
+<li>item_<sub>objeect</sub>.hpp/cpp 物品对象类
+</li>
+</ul>
+</div>
+<ol class="org-ol"><li>shader<br/><div class="outline-text-5" id="text-1-1-4-1">
+<p>
+实现了不同图形接口的着色器语言
+</p>
+</div>
+<ol class="org-ol"><li>glsl<br/></li>
+<li>hlsl<br/></li></ol>
+</li></ol>
+</div>
+
+<div id="outline-container-1-1-5" class="outline-4">
+<h4 id="sec-1-1-5"><span class="section-number-4">1.1.5</span> librender</h4>
+<div class="outline-text-4" id="text-1-1-5">
+<p>
+实现了图形渲染的接口
+</p>
+<ul class="org-ul">
+<li>render.hpp/cpp 渲染设备类
+</li>
+</ul>
+</div>
+</div>
+
+<div id="outline-container-1-1-6" class="outline-4">
+<h4 id="sec-1-1-6"><span class="section-number-4">1.1.6</span> libeffect</h4>
+<div class="outline-text-4" id="text-1-1-6">
+<p>
+特效粒子的实现
+</p>
+<ul class="org-ul">
+<li>effect.hpp/cpp 特效系统类
+</li>
+</ul>
+</div>
+</div>
+
+<div id="outline-container-1-1-7" class="outline-4">
+<h4 id="sec-1-1-7"><span class="section-number-4">1.1.7</span> libcharacter</h4>
+<div class="outline-text-4" id="text-1-1-7">
+<p>
+角色系统的实现
+</p>
+<ul class="org-ul">
+<li>character.hpp/cpp 角色类
+</li>
+</ul>
+</div>
+</div>
+
+<div id="outline-container-1-1-8" class="outline-4">
+<h4 id="sec-1-1-8"><span class="section-number-4">1.1.8</span> libcharacter_<sub>export</sub></h4>
+<div class="outline-text-4" id="text-1-1-8">
+<p>
+在建模工具导出角色时使用
+</p>
+<ul class="org-ul">
+<li>character_<sub>export</sub>.hpp/cpp 角色导出类
+</li>
+</ul>
+</div>
+</div>
+
+<div id="outline-container-1-1-9" class="outline-4">
+<h4 id="sec-1-1-9"><span class="section-number-4">1.1.9</span> libeffect_<sub>export</sub></h4>
+<div class="outline-text-4" id="text-1-1-9">
+<p>
+在建模工具中导出粒子使用
+</p>
+<ul class="org-ul">
+<li>effect_<sub>export</sub>.hpp/cpp 特效导出类
+</li>
+</ul>
+</div>
+</div>
+</div>
+
+<div id="outline-container-1-2" class="outline-3">
+<h3 id="sec-1-2"><span class="section-number-3">1.2</span> doc</h3>
+<div class="outline-text-3" id="text-1-2">
+<p>
+文档存放目录,一些使用org-mode编写的文档，包括本文档在内
+</p>
+</div>
+</div>
+
+<div id="outline-container-1-3" class="outline-3">
+<h3 id="sec-1-3"><span class="section-number-3">1.3</span> lib</h3>
+<div class="outline-text-3" id="text-1-3">
+<p>
+库文件输出的所在
+</p>
+</div>
+</div>
+
+<div id="outline-container-1-4" class="outline-3">
+<h3 id="sec-1-4"><span class="section-number-3">1.4</span> bin</h3>
+<div class="outline-text-3" id="text-1-4">
+<p>
+应用程序输出所在
+</p>
+</div>
+</div>
+</div>
+
+<div id="outline-container-2" class="outline-2">
+<h2 id="sec-2"><span class="section-number-2">2</span> 场景绘制</h2>
+</div>
+</div>
+<div id="postamble" class="status">
+<p class="author">Author: devilogic</p>
+<p class="date">Created: 2013-04-13 六 20:39</p>
+<p class="creator"><a href="http://www.gnu.org/software/emacs/">Emacs</a> 23.4.1 (<a href="http://orgmode.org">Org</a> mode 8.0-pre)</p>
+<p class="xhtml-validation"><a href="http://validator.w3.org/check?uri=referer">Validate XHTML 1.0</a></p>
+</div>
+</body>
+</html>

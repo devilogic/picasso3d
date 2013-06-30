@@ -1,0 +1,65 @@
+#+STARTUP: indent
+#+TITLE: Picasso3D引擎设计文档
+#+AUTHOR: devilogic
+#+EMAIL: logic.yan@gmail.com
+
+* 源码目录说明
+** include & src
+这两个目录一个是头文件所在,一个是源文件所在在其下有着相同的目录结构
+*** libcommon
+一些辅助功能以及类型定义
+- container.hpp/cpp 用于定义内存容器类,本系统有些关键类的内存分配都是存放到此类中
+- memory__pool.hpp/cpp 用于定义内存容器类事实具体内存管理的类
+- memdata__converter.hpp/cpp 用于安全的存取一块内存
+- crc32.hpp/cpp CRC32算法的实现类
+- file.hpp/cpp 文件操作类
+- error.hpp/cpp 错误记录类
+- string.hpp/cpp 字符串操作类
+- thread.hpp/cpp 线程类
+**** base
+- base.hpp/cpp 用于存放一些公共的头以及常用的宏以及支持函数
+- configure.hpp 用于定义本系统中所使用的C++语言的关键字宏以及编译开关宏
+- typedef.hpp 用于定义本系统所使用的类型
+- except.hpp 用于定义C语言SEH异常结构的异常宏代码
+*** libgraphics
+计算机图形学算法相关实现
+- vertex.hpp/cpp 顶点类
+- line.hpp/cpp 线段类
+- triangle.hpp/cpp 三角图元类
+- color.hpp/cpp 颜色类
+*** libmath
+基础的数学工具算法实现
+- vector.hpp/cpp 顶点类
+- matrix.hpp/cpp 矩阵类
+*** libscene
+此目录下的代码负责对场景进行渲染管理
+- object.hpp/cpp 场景中一切对象，例如：“角色，物品，特效,...”，实现的基类
+- character__object.hpp/cpp 角色对象类
+- effect__object.hpp/cpp 特效对象类
+- item__objeect.hpp/cpp 物品对象类
+**** shader
+实现了不同图形接口的着色器语言
+***** glsl
+***** hlsl
+*** librender
+实现了图形渲染的接口
+- render.hpp/cpp 渲染设备类
+*** libeffect
+特效粒子的实现
+- effect.hpp/cpp 特效系统类
+*** libcharacter
+角色系统的实现
+- character.hpp/cpp 角色类
+*** libcharacter__export
+在建模工具导出角色时使用
+- character__export.hpp/cpp 角色导出类
+*** libeffect__export
+在建模工具中导出粒子使用
+- effect__export.hpp/cpp 特效导出类
+** doc
+文档存放目录,一些使用org-mode编写的文档，包括本文档在内
+** lib
+库文件输出的所在
+** bin
+应用程序输出所在
+* 场景绘制

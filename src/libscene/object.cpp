@@ -1,0 +1,2 @@
+#include "libscene/object.hpp"
+
